@@ -111,8 +111,8 @@ The JSON must be an object with these fields:
 | ---- | -------- | ---- | ----------- |
 | `From` | Yes | string | Who sent this alert. |
 | `Title` | Yes | string | One-line description of the alert. |
-| `Date` | No | string | RFC3339 format date string.<br>By default, the current date will be used for the alert. |
-| `Host` | No | string | Where this alert was generated.<br>By default, the request client's IP address is used. |
+| `Date` | No | string | RFC3339 format date string. By default, the current date will be used for the alert. |
+| `Host` | No | string | Where this alert was generated. By default, the request client's IP address is used. |
 | `Message` | No | string | Multi-line description of the alert. |
 | `Info` | No | object | Additional fields. |
 
@@ -140,8 +140,8 @@ The JSON object must be an object with these fields:
 | Name | Required | Type | Description |
 | ---- | -------- | ---- | ----------- |
 | `type` | Yes | string | Filter type such as `discard`, `group`, `route`. |
-| `disabled` | No | bool | If `true`, the filter will not be used.<br>The default value is `false`. |
-| `all` | No | bool | If `true`, the filter works for all alerts (not one-by-one).<br>The default value is `false`. |
+| `disabled` | No | bool | If `true`, the filter will not be used. The default value is `false`. |
+| `all` | No | bool | If `true`, the filter works for all alerts (not one-by-one). The default value is `false`. |
 | `if` | No | string/array of strings | Filter condition. |
 | `expire` | No | string | RFC3339 date string. The filter will automatically be removed at the given date. |
 
