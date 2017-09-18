@@ -61,76 +61,92 @@ API List
 
 Each subsection describes the method and the end point (URL) of an API.
 
-* [GET /version](#get-version)
-* [GET /alerts](#get-alerts)
-* [POST /alerts](#post-alerts)
-* [GET /filters](#get-filters)
-* [PUT /filters/ID](#put-filtersid)
-* [GET /filters/ID](#get-filtersid)
-* [DELETE /filters/ID](#delete-filtersid)
-* [PUT /filters/ID/enable](#put-filtersidenable)
-* [PUT /filters/ID/disable](#put-filtersiddisable)
-* [PUT /filters/ID/inactivate](#put-filtersidinactivate)
-* [GET /routes](#get-routes)
-* [PUT /routes/ID](#put-routesid)
-* [GET /routes/ID](#get-routesid)
+* [Version [ /version ]](#version--version-)
+    * [GET](#get)
+* [Alerts [ /alerts ]](#alerts--alerts-)
+    * [GET](#get-1)
+    * [POST](#post)
+* [Filters [ /filters ]](#filters--filters-)
+    * [GET](#get-2)
+* [Filter ID [ /filters/{ID} ]](#filter-id--filtersid-)
+    * [PUT](#put)
+    * [GET](#get-3)
+    * [DELETE](#delete)
+* [Enable filter ID [ /filters/{ID}/enable ]](#enable-filter-id--filtersidenable-)
+    * [PUT](#put-1)
+* [Disable filter ID [ /filters/{ID}/disable ]](#disable-filter-id--filtersiddisable-)
+    * [PUT](#put-2)
+* [Inactive filter ID [ /filters/{ID}/inactivate ]](#inactivate-filter-id--filtersidinactivate-)
+    * [PUT](#put-3)
+* [Routes [ /routes ]](#routes--routes-)
+    * [GET](#get-4)
+* [Route ID [ /routes/{ID} ]](#route-id--routesid-)
+    * [PUT](#put-4)
+    * [GET](#get-5)
 
-### GET /version
+### Version [ /version ]
+
+#### GET
 
 Return version string like `0.1.1` as "text/plain".
 
 This API does *not* require the authentication token.
 
-### GET /alerts
+### Alerts [ /alerts ]
+
+#### GET
 
 Return a JSON array of pending alert objects.
 
-### POST /alerts
+#### POST
+
+Post a new alert.
 
 * Content-Type: application/json
 * Body: see below.
 
-Post a new alert.  The JSON must be an object with these fields:
+The JSON must be an object with these fields:
 
 | Name | Required | Type | Description |
 | ---- | -------- | ---- | ----------- |
 | `From` | Yes | string | Who sent this alert. |
 | `Title` | Yes | string | One-line description of the alert. |
-| `Date` | No | string | RFC3339 format date string. |
-| `Host` | No | string | Where this alert was generated. |
+| `Date` | No | string | RFC3339 format date string.<br>By default, the current date will be used for the alert. |
+| `Host` | No | string | Where this alert was generated.<br>By default, the request client's IP address is used. |
 | `Message` | No | string | Multi-line description of the alert. |
 | `Info` | No | object | Additional fields. |
 
-If `Date` is omitted, the current date will be used for the alert.
+### Filters [ /filters ]
 
-If `Host` is omitted, the request client's IP address is used.
-
-### GET /filters
+#### GET
 
 Return all filter IDs as a JSON array.
 The IDs are ordered the same as the filters are ordered.
 
-### PUT /filters/ID
+### Filter ID [ /filters/{ID} ]
+
+* Parameters
+    * ID: (required, string) - `ID` must match this regexp: `^[a-zA-Z0-9_-]+$`.
+
+#### PUT
+
+Create a new filter with `ID`, or edit the existing filter matching `ID`.
 
 * Content-Type: application/json
 * Body: see below.
 
-`ID` must match this regexp: `^[a-zA-Z0-9_-]+$`
-
-Create a new filter with `ID`, or edit the existing filter matching `ID`.
 The JSON object must be an object with these fields:
 
 | Name | Required | Type | Description |
 | ---- | -------- | ---- | ----------- |
 | `type` | Yes | string | Filter type such as `discard`, `group`, `route`. |
-| `disabled` | No | bool | If `true`, the filter will not be used. |
-| `all` | No | bool | If `true`, the filter works for all alerts (not one-by-one). |
+| `disabled` | No | bool | If `true`, the filter will not be used.<br>The default value is `false`. |
+| `all` | No | bool | If `true`, the filter works for all alerts (not one-by-one).<br>The default value is `false`. |
 | `if` | No | string/array of strings | Filter condition. |
-| `expire` | No | string | RFC3339 date string. |
+| `expire` | No | string | RFC3339 date string. The filter will automatically be removed
+at the given date. |
 
 Other fields may be used depending on the filter type.
-
-The default values of `disabled` and `all` are `false`.
 
 `if` may be either a string of JavaScript boolean expression to
 test an alert or an array of alerts should be filtered, or an array
@@ -149,37 +165,48 @@ the filter feeds a JSON object representing an alert via stdin.
 Not all filters can be configured by `all`.  For example, `group` filter
 always works as if `all` is `true`.
 
-If `expire` is given, the filter will automatically be removed
-at the given date.
-
-### GET /filters/ID
+#### GET
 
 Return a JSON representation of the filter specified by `ID`.
 
-In addition to fields for PUT method, GET may return these read-only fields:
+**GET** may return these read-only fields for **PUT** method:
 
 | Name       | Type   | Description                                     |
 | ---------- | ------ | ----------------------------------------------- |
-| `inactive` | string | RFC3339 date string. See /filters/ID/inactivate |
+| `inactive` | string | RFC3339 date string. See [/filters/{ID}/inactivate](#inactivate-filter-id--filtersidinactivate-) |
 
-
-### DELETE /filters/ID
+#### DELETE
 
 Delete a filter specified by `ID`.
 
-### PUT /filters/ID/enable
+### Enable filter ID [ /filters/{ID}/enable ]
+
+* Parameters
+    * ID: (required, string) - `ID` must match this regexp: `^[a-zA-Z0-9_-]+$`.
+
+#### PUT
 
 Enable the filter specified by `ID`.
 The body should be empty (Content-Length is 0).
 
 If the filter is currently inactive, it is activated.
 
-### PUT /filters/ID/disable
+### Disable filter ID [ /filters/{ID}/disable ]
+
+* Parameters
+    * ID: (required, string) - `ID` must match this regexp: `^[a-zA-Z0-9_-]+$`.
+
+#### PUT
 
 Disable the filter specified by `ID`.
 The body should be empty (Content-Length is 0).
 
-### PUT /filters/ID/inactivate
+### Inactivate filter ID [ /filters/{ID}/inactivate ]
+
+* Parameters
+    * ID: (required, string) - `ID` must match this regexp: `^[a-zA-Z0-9_-]+$`.
+
+#### PUT
 
 Inactivate the specified filter until the given time.
 The body must be a JSON object with the following single field:
@@ -188,18 +215,23 @@ The body must be a JSON object with the following single field:
 | ------- | -------- | ------ | -------------------- |
 | `until` | Yes      | string | RFC3339 date string. |
 
-### GET /routes
+### Routes [ /routes ]
+
+#### GET
 
 Return all route IDs as a JSON array.
 
-### PUT /routes/ID
+### Route ID [ /routes/{ID} ]
+
+* Parameters
+    * ID: (required, string) - `ID` must match this regexp: `^[a-zA-Z0-9_-]+$`.
+
+#### PUT
+
+Create a new route or replace existing one.
 
 * Content-Type: application/json
 * Body: JSON array of objects.
-
-`ID` must match this regexp: `^[a-zA-Z0-9_-]+$`
-
-Create a new route or replace existing one.
 
 The body must be a JSON array of objects.
 
@@ -225,7 +257,7 @@ An example JSON may look like:
 ]
 ```
 
-### GET /routes/ID
+#### GET
 
 Return a JSON representation of the route specified by `ID`.
 
