@@ -143,8 +143,7 @@ The JSON object must be an object with these fields:
 | `disabled` | No | bool | If `true`, the filter will not be used.<br>The default value is `false`. |
 | `all` | No | bool | If `true`, the filter works for all alerts (not one-by-one).<br>The default value is `false`. |
 | `if` | No | string/array of strings | Filter condition. |
-| `expire` | No | string | RFC3339 date string. The filter will automatically be removed
-at the given date. |
+| `expire` | No | string | RFC3339 date string. The filter will automatically be removed at the given date. |
 
 Other fields may be used depending on the filter type.
 
@@ -169,7 +168,7 @@ always works as if `all` is `true`.
 
 Return a JSON representation of the filter specified by `ID`.
 
-**GET** may return these read-only fields for **PUT** method:
+*GET* may return these read-only fields for *PUT* method:
 
 | Name       | Type   | Description                                     |
 | ---------- | ------ | ----------------------------------------------- |
