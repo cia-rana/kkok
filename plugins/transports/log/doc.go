@@ -8,7 +8,7 @@ The plugin takes there construction parameters:
   lebel     string  ""       Arbitrary string label.
   severity  string  "info"   Log lebel.
 
-Example snippet for TOML congiguration:
+Example snippet for TOML configuration:
 
   [[route.notify]]
     type     = "log"
